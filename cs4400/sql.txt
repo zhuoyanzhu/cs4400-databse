@@ -1,0 +1,112 @@
+1.log in
+SELECT * FROM User 
+WHERE username="username" AND password="password"
+
+
+2.register
+INSERT INTO User (
+username,email,password,usertype) 
+VALUES("username", "zz@gatech.edu", "password", '1')
+ WHERE NOT EXISTS (SELECT * FROM User WHERE username = username) AND email LIKE '%@gatech.edu';
+					  
+					  
+Student Functionalities
+1. Main Page search and filter
+
+ /*select Course*/
+SELECT * FROM(SELECT DISTINCT course_name FROM Course_is_category 
+WHERE category_name IN ("cateogry1", "category2") 
+GROUP BY course_name HAVING COUNT(DISTINCT category_name)=2) AS res1 
+INNER JOIN (SELECT * FROM Course WHERE (name='name' OR 'name'='') 
+AND (designation_name='name2' OR 'name2'='')) AS res2 ON res1.course_name=res2.name
+ 
+ /*select project*/
+ SELECT DISTINCT * FROM (SELECT DISTINCT project_name FROM Project_is_category 
+ WHERE category_name IN ("cateogry1", "category2") 
+ GROUP BY project_name HAVING COUNT(DISTINCT category_name)=2) AS res1 
+ INNER JOIN (SELECT * FROM Project WHERE (name LIKE '%name%' OR 'name'='') 
+ AND (designation_name='Community' OR 'Community'='')) AS res2 
+ INNER JOIN (SELECT t1.name FROM (SELECT name, GROUP_CONCAT(requirement SEPARATOR ', ') AS requirements
+ FROM Project_requirement GROUP BY name) AS t1 WHERE (requirement LIKE '%Computer Science%' 
+ OR requirement LIKE '%College of Computing%' )
+ AND requirement LIKE '%Freshman%') AS res3 
+ WHERE res1.project_name=res2.name AND res2.name=res3.name 
+ 
+ 2.profile show
+ /*get a user's major*/
+SELECT major FROM User 
+WHERE Username="username"
+/*get a user's year*/
+SELECT year FROM User 
+WHERE Username="username"
+ /*get a major's department*/
+SELECT dept_name FROM Major WHERE name="name"
+ 
+ 3.change major and year
+ /*update user's major*/
+UPDATE User SET major="major" WHERE username="username"
+/*update user's year*/
+UPDATE User SET year="year" WHERE username="username"
+
+4.show application
+/*get student's applications*/
+ SELECT project_name, date, status FROM Apply
+  WHERE student_name="name"
+  
+Admin Functionalities
+1.view application
+SELECT project_name AS Project,  major AS ApplicantMajor, year AS ApplicantYear, status, User.username AS name 
+FROM Apply INNER JOIN User ON User.username=Apply.student_name
+
+2.view popular report
+/*selectNumOfApply*/
+SELECT project_name AS Project,  count(student_name) AS Number 
+FROM Apply GROUP BY project_name ORDER BY number DESC LIMIT 10
+
+3.View Application Report
+/*get all application number*/
+SELECT count(*) AS number
+FROM Apply
+
+/*get all acception number*/
+SELECT count(*) AS number 
+FROM Apply WHERE status='accepted'
+
+/*report*/
+(((SELECT project_name AS Project, count(student_name) 
+AS number FROM Apply WHERE status='accepted' GROUP BY project_name) 
+UNION (SELECT project_name AS Project, 0 FROM Apply GROUP BY project_name 
+HAVING COUNT(status IN ('accepted') OR NULL)=0))AS number2)
+SELECT res1.Project, res1.NumberofApplicant, res1.accepterate, res2.Major 
+FROM (SELECT number1.Project, number1.number AS NumberofApplicant, (number2.number * 100 / number1.number) AS accepterate 
+FROM ((SELECT project_name AS Project, count(student_name) AS number FROM Apply GROUP BY project_name) AS number1) 
+INNER JOIN (((SELECT project_name AS Project, count(student_name) AS number 
+FROM Apply WHERE status='accepted' GROUP BY project_name) 
+UNION (SELECT project_name AS Project, 0 
+FROM Apply GROUP BY project_name 
+HAVING COUNT(status IN ('accepted') OR NULL)=0))AS number2) 
+ON number1.Project=number2.Project) AS res1 
+INNER JOIN (SELECT p.project_name AS Project, substring_index(GROUP_CONCAT(p.major 
+ORDER BY p.number DESC SEPARATOR '/'), '/', 3) AS Major 
+FROM ((SELECT project_name, major, count(*) AS number 
+FROM Apply INNER JOIN User ON User.username=Apply.student_name 
+GROUP BY Apply.project_name, User.major) AS p) GROUP BY p.project_name) AS res2 ON res1.Project=res2.Project 
+ORDER BY accepterate DESC
+
+4.insert project
+
+/*insert into Project_is_category*/
+/*insert into project table*/
+INSERT INTO Project VALUES
+("name", "description", "est_num", "adivisor_name", "adivisor@email.com", "designation_name")
+INSERT INTO Project_is_category 
+VALUES("project_name", "category_name")
+/*insert into project requriment*/
+INSERT INTO Project_requirement VALUES("name", "requirement")
+
+5.insert course
+/*insert into course*/
+INSERT INTO Course VALUES("name", "course_number", "instructor", "est_num", "designation_name")
+/*insert into table Course_is_category*/
+INSERT INTO Course_is_category VALUES("course_name", "category_name")
+

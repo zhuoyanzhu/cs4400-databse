@@ -1,0 +1,51 @@
+*:focus {
+  outline: none;
+}
+
+html, body {
+    height: 100%;
+    margin: 0 auto;
+}
+
+body {
+    background-size: cover;
+    height: 100%;
+}
+
+.fun1, .fun2, .fun3,.fun4, .fun5, .fun6 .table {
+	text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    font-family: 'Quicksand', sans-serif;
+}
+
+.functionality {
+	text-align: center;
+    font-size: 67px;
+    font-weight: 700;
+    color: #000000;
+}
+
+tbody {
+	overflow-x: hidden;
+	overflow-y:auto;
+    height: 300px;
+    display: inline-block;
+    width: 100%;
+	flex: 0 0 auto;
+}
+thead {
+    display: block;
+    width: 100%;
+    height: 50px;
+	flex: 1 1 auto;
+}
+
+table tbody tr {
+    width: 100%;
+}
+
+table thead, table tbody tr {
+    display: table;
+    table-layout: fixed;
+}
